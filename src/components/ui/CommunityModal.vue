@@ -177,7 +177,7 @@ onBeforeUnmount(() => {
   width: 100%; padding: 13px 24px;
   background: var(--accent);
   border: none; border-radius: 12px;
-  color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.9rem; font-weight: 700;
+  color: #fff; font-family: var(--font); font-size: 0.9rem; font-weight: 700;
   text-decoration: none; cursor: pointer;
   transition: opacity 0.2s ease, transform 0.15s ease;
 }
@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
 .btn-later {
   width: 100%; padding: 12px 24px;
   background: var(--glass-2); border: 1px solid var(--border-soft); border-radius: 12px;
-  color: var(--t1); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.875rem; font-weight: 700;
+  color: var(--t1); font-family: var(--font); font-size: 0.875rem; font-weight: 700;
   cursor: pointer; transition: all 0.2s ease;
 }
 .btn-later:hover { background: var(--glass-hover); color: var(--t1); border-color: var(--border); }

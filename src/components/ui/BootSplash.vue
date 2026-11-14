@@ -8,10 +8,15 @@
         </div>
         <span class="boot__name">Globalgle</span>
 
-        <div class="boot__bar">
-          <div class="boot__fill" :style="{ width: pct + '%' }"></div>
+        <div class="boot__loader">
+          <div class="boot__meta">
+            <span class="boot__label">Loading</span>
+            <span class="boot__pct">{{ pct }}%</span>
+          </div>
+          <div class="boot__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" :aria-valuenow="pct">
+            <div class="boot__fill" :style="{ width: pct + '%' }"></div>
+          </div>
         </div>
-        <span class="boot__pct">{{ pct }}%</span>
       </div>
     </div>
   </Transition>
@@ -58,75 +63,96 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
+  /* Tea canvas with soft moss / tea glows */
+  background:
+    radial-gradient(60% 50% at 50% 38%, rgba(199, 213, 159, 0.55) 0%, transparent 70%),
+    radial-gradient(40% 40% at 100% 100%, rgba(64, 83, 26, 0.10) 0%, transparent 70%),
+    var(--canvas);
 }
 
 .boot__center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
 }
 
-/* ── Logo ── */
+/* ── Logo — small circle with a tea ring ── */
 .boot__logo-wrap {
-  position: relative;
-  width: 84px;
-  height: 84px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  padding: 3px;
+  background: var(--tea);
   animation: boot-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .boot__logo {
-  position: relative;
-  z-index: 1;
-  width: 72px;
-  height: 72px;
-  border-radius: 20px;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   object-fit: cover;
+  display: block;
 }
 
-/* ── Brand name with sheen ── */
 .boot__name {
   font-size: 1.05rem;
   font-weight: 800;
-  letter-spacing: 0.01em;
-  color: var(--t1);
+  letter-spacing: -0.02em;
+  color: var(--moss);
   animation: boot-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
 }
 
-/* ── Slim progress bar ── */
+/* ── Bar loader ── */
+.boot__loader {
+  width: 260px;
+  max-width: 72vw;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: boot-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
+}
+.boot__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.boot__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+.boot__pct {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--moss);
+  font-variant-numeric: tabular-nums;
+}
+
 .boot__bar {
   position: relative;
-  width: 180px;
-  height: 4px;
+  height: 10px;
   border-radius: 999px;
-  background: var(--glass-hover);
+  background: rgba(64, 83, 26, 0.12);
+  box-shadow: inset 0 1px 2px rgba(64, 83, 26, 0.15);
   overflow: hidden;
-  animation: boot-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
 }
 .boot__fill {
   position: relative;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #16a34a 0%, #22c55e 50%, #34d17a 100%);
+  background: linear-gradient(90deg, #2f3e12 0%, #40531a 45%, #6b8730 100%);
   transition: width 0.18s ease-out;
+  overflow: hidden;
 }
 .boot__fill::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%);
+  background: linear-gradient(100deg, transparent 0%, rgba(199, 213, 159, 0.65) 50%, transparent 100%);
   transform: translateX(-100%);
   animation: boot-sheen 1.1s ease-in-out infinite;
-}
-.boot__pct {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--t3);
-  letter-spacing: 0.04em;
-  font-variant-numeric: tabular-nums;
-  animation: boot-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
 }
 
 @keyframes boot-rise {

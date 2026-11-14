@@ -6,20 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Globalgle Dashboard</title>
 
-    <!-- Plus Jakarta Sans — Google Fonts -->
+    <!-- Fallback until licensed RX100 files are added to /public/fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <!-- Lord Icon -->
     <script src="https://cdn.lordicon.com/lordicon.js"></script>
 
-    <!-- Apply saved theme before first paint to avoid a flash -->
+    <!-- Single light theme (Moss & Tea) — set before first paint -->
     <script>
-      (function () {
-        var theme = localStorage.getItem('globalgle_theme') === 'light' ? 'light' : 'dark'
-        document.documentElement.setAttribute('data-theme', theme)
-      })()
+      document.documentElement.setAttribute('data-theme', 'light')
     </script>
   </head>
   <body>

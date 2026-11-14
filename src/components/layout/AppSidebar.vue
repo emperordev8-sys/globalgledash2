@@ -1,8 +1,4 @@
-﻿
-
-
-
-<!-- src/components/layout/AppSidebar.vue -->
+﻿<!-- src/components/layout/AppSidebar.vue -->
 <template>
 
   <!-- Backdrop (mobile only) -->
@@ -10,22 +6,18 @@
     <div v-if="sidebarOpen" class="sidebar-backdrop" @click="closeSidebar"/>
   </Transition>
 
-  <aside class="sidebar" :class="{ 'sidebar--open': sidebarOpen, 'sidebar--desktop-closed': !desktopOpen }" ref="sidebarEl">
+  <aside class="sidebar" :class="{ 'sidebar--open': sidebarOpen, 'sidebar--desktop-closed': !desktopOpen }">
 
     <!-- Logo -->
     <div class="sidebar__logo">
       <div class="sidebar__logo-icon">
-        <img
-          :src="logoSrc"
-          alt="Globalgle logo"
-          class="logo-img"
-        />
+        <img :src="logoSrc" alt="Globalgle logo" class="logo-img" />
       </div>
       <span class="sidebar__logo-name">Globalgle</span>
 
       <!-- Toggle / close button -->
-      <button class="vaulto-badge" @click="handleBadgeClick" aria-label="Toggle sidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <button class="sidebar__toggle" @click="handleBadgeClick" aria-label="Toggle sidebar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="11 17 6 12 11 7"/>
           <polyline points="18 17 13 12 18 7"/>
         </svg>
@@ -35,176 +27,60 @@
     <!-- Scrollable nav area -->
     <div class="sidebar__scroll" ref="scrollEl">
 
-    <!-- GO MENU -->
-    <div class="sidebar__group">
-      <span class="sidebar__group-label">Go Menu</span>
-      <nav class="sidebar__nav">
-        <router-link to="/" class="nav-item" :class="{ 'nav-item--active': $route.path === '/' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Dashboard</span>
-        </router-link>
-      </nav>
-    </div>
+      <div
+        v-for="group in groups"
+        :key="group.label"
+        class="sidebar__group"
+        :data-tour="group.tour"
+      >
+        <span class="sidebar__group-label">{{ group.label }}</span>
+        <nav class="sidebar__nav">
+          <template v-for="item in group.items" :key="item.label">
 
-    <!-- TOOLS -->
-    <div class="sidebar__group" data-tour="sidebar-nav">
-      <span class="sidebar__group-label">Tools</span>
-      <nav class="sidebar__nav">
-        <!-- Website Creator -->
-        <router-link to="/website-creator" class="nav-item" :class="{ 'nav-item--active': $route.path === '/website-creator' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="5" y1="6.5" x2="5.01" y2="6.5"/><line x1="8" y1="6.5" x2="8.01" y2="6.5"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Website Creator</span>
-        </router-link>
+            <!-- Plain action (coming soon) -->
+            <button v-if="item.soon" class="nav-item" @click="openSoon(item.label)">
+              <span class="nav-item__icon">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="item.icon" />
+              </span>
+              <span class="nav-item__label">{{ item.label }}</span>
+            </button>
 
-        <!-- Digital -->
-        <router-link to="/digital" class="nav-item" :class="{ 'nav-item--active': $route.path === '/digital' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Digital</span>
-        </router-link>
+            <!-- Route link -->
+            <router-link
+              v-else
+              :to="item.to"
+              class="nav-item"
+              :class="{ 'nav-item--active': isActive(item) }"
+              @click="closeSidebar"
+            >
+              <span class="nav-item__icon">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="item.icon" />
+              </span>
+              <span class="nav-item__label">{{ item.label }}</span>
+              <span v-if="item.badge" class="nav-item__meta">
+                <span class="nav-item__badge">{{ item.badge }}</span>
+              </span>
+            </router-link>
 
-        <!-- Call -->
-        <router-link to="/tools/call" class="nav-item" :class="{ 'nav-item--active': $route.path.startsWith('/tools/call') || $route.path === '/tools/voice-notes' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.38 2 2 0 0 1 3.6 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l1.27-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Call</span>
-        </router-link>
-
-        <!-- Mailing -->
-        <router-link to="/customers" class="nav-item" :class="{ 'nav-item--active': $route.path === '/customers' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Mailing</span>
-        </router-link>
-
-        <!-- Generator -->
-        <router-link to="/tools" class="nav-item" :class="{ 'nav-item--active': $route.path === '/tools' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3l1.9 4.9L19 9.8l-4.9 1.9L12 17l-1.9-5.3L5 9.8l5.1-1.9z"/><path d="M19 15l.6 1.6L21 17l-1.4.4L19 19l-.6-1.6L17 17l1.4-.4z"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Generator</span>
-        </router-link>
-      </nav>
-    </div>
-
-    <!-- SYSTEM -->
-    <div class="sidebar__group">
-      <span class="sidebar__group-label">System</span>
-      <nav class="sidebar__nav">
-        <router-link to="/wallet" class="nav-item" :class="{ 'nav-item--active': $route.path === '/wallet' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12h2"/><path d="M2 10h20"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">My Wallet</span>
-          <span class="nav-item__meta">
-            <span class="nav-item__badge">₦0.00</span>
-          </span>
-        </router-link>
-
-        <router-link to="/billing" class="nav-item" :class="{ 'nav-item--active': $route.path === '/billing' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Billing &amp; Plans</span>
-        </router-link>
-      </nav>
-    </div>
-
-    <!-- OTHER -->
-    <div class="sidebar__group">
-      <span class="sidebar__group-label">Other</span>
-      <nav class="sidebar__nav">
-
-        <!-- Start Reselling -->
-        <router-link to="/reselling" class="nav-item" :class="{ 'nav-item--active': $route.path === '/reselling' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/><polyline points="9 12 11 14 15 10"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Start Reselling</span>
-        </router-link>
-
-        <!-- Terms -->
-        <button class="nav-item nav-item--plain" @click="openSoon('Terms')">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Terms</span>
-        </button>
-
-        <router-link to="/settings" class="nav-item" :class="{ 'nav-item--active': $route.path === '/settings' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Settings</span>
-        </router-link>
-
-        <router-link to="/help" class="nav-item" :class="{ 'nav-item--active': $route.path === '/help' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Support</span>
-        </router-link>
-
-        <router-link to="/complaint" class="nav-item" :class="{ 'nav-item--active': $route.path === '/complaint' }" @click="closeSidebar">
-          <div class="nav-item__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
-            </svg>
-          </div>
-          <span class="nav-item__label">Complaint</span>
-        </router-link>
-      </nav>
-    </div>
+          </template>
+        </nav>
+      </div>
 
       <!-- Upgrade CTA -->
       <div class="sidebar__upgrade" data-tour="upgrade">
         <div class="upgrade__header">
           <span class="upgrade__icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M2 7l4.8 3.6L12 3.5l5.2 7.1L22 7l-1.8 11.5a1 1 0 0 1-1 .85H4.8a1 1 0 0 1-1-.85L2 7z"/>
             </svg>
           </span>
           <p class="upgrade__title">Upgrade Pro!</p>
         </div>
         <p class="upgrade__desc">Upgrade to Pro and elevate your experience today</p>
-        <div class="upgrade__actions">
-          <button class="upgrade__btn" @click.stop="goUpgrade">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
-            Upgrade
-          </button>
-          <a class="upgrade__learn" @click.stop="goUpgrade">Learn more</a>
-        </div>
+        <button class="upgrade__btn" @click.stop="goUpgrade">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+          Upgrade
+        </button>
       </div>
 
       <!-- Logout button -->
@@ -214,17 +90,16 @@
           <polyline points="16 17 21 12 16 7"/>
           <line x1="21" y1="12" x2="9" y2="12"/>
         </svg>
-        Log Out
+        <span class="sidebar__logout-text">Log Out</span>
       </button>
 
     </div><!-- end sidebar__scroll -->
-
 
   </aside>
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import logo1 from '../../assets/logo1.jpg'
 import { useSidebar } from '../../composables/useSidebar.js'
@@ -232,57 +107,84 @@ import { useToast } from '../../composables/useToast.js'
 
 const { sidebarOpen, desktopOpen, closeSidebar, toggleDesktopSidebar } = useSidebar()
 const { info } = useToast()
+const router = useRouter()
+const route = useRoute()
+const logoSrc = logo1
+
+/* ── Icons (24×24, stroke) ── */
+const I = {
+  home: '<path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/>',
+  site: '<rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="5" y1="6.5" x2="5.01" y2="6.5"/><line x1="8" y1="6.5" x2="8.01" y2="6.5"/>',
+  tool: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  call: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.38 2 2 0 0 1 3.6 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l1.27-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+  spark: '<path d="M12 3l1.9 4.9L19 9.8l-4.9 1.9L12 17l-1.9-5.3L5 9.8l5.1-1.9z"/><path d="M19 15l.6 1.6L21 17l-1.4.4L19 19l-.6-1.6L17 17l1.4-.4z"/>',
+  wallet: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12h2"/><path d="M2 10h20"/>',
+  doc: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/>',
+  shield: '<path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/><polyline points="9 12 11 14 15 10"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  flag: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+}
+
+/* ── Navigation (same routes as before) ── */
+const groups = [
+  {
+    label: 'Go Menu',
+    items: [
+      { label: 'Dashboard', to: '/', icon: I.home, exact: true },
+    ],
+  },
+  {
+    label: 'Tools',
+    tour: 'sidebar-nav',
+    items: [
+      { label: 'Website Creator', to: '/website-creator', icon: I.site },
+      { label: 'Digital', to: '/digital', icon: I.tool },
+      { label: 'Call', to: '/tools/call', icon: I.call, also: ['/tools/call', '/tools/voice-notes'] },
+      { label: 'Mailing', to: '/customers', icon: I.mail },
+      { label: 'Generator', to: '/tools', icon: I.spark, exact: true },
+    ],
+  },
+  {
+    label: 'System',
+    items: [
+      { label: 'My Wallet', to: '/wallet', icon: I.wallet, badge: '₦0.00' },
+      { label: 'Billing & Plans', to: '/billing', icon: I.doc },
+    ],
+  },
+  {
+    label: 'Other',
+    items: [
+      { label: 'Start Reselling', to: '/reselling', icon: I.shield },
+      { label: 'Terms', icon: I.doc, soon: true },
+      { label: 'Settings', to: '/settings', icon: I.gear },
+      { label: 'Support', to: '/help', icon: I.help },
+      { label: 'Complaint', to: '/complaint', icon: I.flag },
+    ],
+  },
+]
+
+function isActive(item) {
+  const p = route.path
+  if (item.also) return item.also.some(a => p === a || p.startsWith(a))
+  return p === item.to
+}
 
 function openSoon(name) {
   closeSidebar()
   info(`${name} coming soon`, 'This section is not available yet — check back shortly.')
 }
-const logoSrc = logo1
-const router = useRouter()
-const route = useRoute()
 
 function handleBadgeClick() {
-  if (window.innerWidth >= 769) {
-    toggleDesktopSidebar()
-  } else {
-    closeSidebar()
-  }
+  if (window.innerWidth >= 769) toggleDesktopSidebar()
+  else closeSidebar()
 }
 
 /* Reset sidebar scroll to top on every route change */
 const scrollEl = ref(null)
-const sidebarEl = ref(null)
-const indicatorStyle = ref({ top: '0px', height: '32px', opacity: '0', transition: 'top 0.25s ease, opacity 0.2s ease' })
-
-function updateIndicator() {
-  const activeItem = document.querySelector('.nav-item--active')
-  const sidebar = sidebarEl.value
-  if (!activeItem || !sidebar) {
-    indicatorStyle.value = { ...indicatorStyle.value, opacity: '0' }
-    return
-  }
-  const itemRect = activeItem.getBoundingClientRect()
-  const sidebarRect = sidebar.getBoundingClientRect()
-  indicatorStyle.value = {
-    top: `${itemRect.top - sidebarRect.top}px`,
-    height: `${itemRect.height}px`,
-    opacity: '1',
-    transition: 'top 0.25s ease, opacity 0.2s ease',
-  }
-}
-
 watch(() => route.path, () => {
   if (scrollEl.value) scrollEl.value.scrollTop = 0
-  nextTick(updateIndicator)
-})
-
-onMounted(() => {
-  nextTick(updateIndicator)
-  scrollEl.value?.addEventListener('scroll', updateIndicator)
-})
-
-onUnmounted(() => {
-  scrollEl.value?.removeEventListener('scroll', updateIndicator)
 })
 
 function goUpgrade() {
@@ -290,558 +192,263 @@ function goUpgrade() {
   router.push('/billing')
 }
 
-function goAccount() {
-  closeSidebar()
-  router.push('/settings')
-}
-
 function logout() {
   closeSidebar()
   localStorage.removeItem('globalgle_auth')
   router.push('/auth')
 }
-
-
-
 </script>
 
 <style scoped>
-/* ── Shell ── */
+/* ══════════════════════════════════════════════
+   SHELL — floating Dark Moss panel
+   ══════════════════════════════════════════════ */
 .sidebar {
-  width: 260px;
-  height: 100vh;
-  height: 100dvh; /* dynamic viewport — fixes iOS Safari address-bar clipping */
+  --sb-text: rgba(244, 248, 232, 0.76);
+  --sb-text-strong: #f4f8e8;
+  --sb-line: rgba(199, 213, 159, 0.16);
+
+  width: 248px;
+  position: fixed;
+  top: 14px; left: 14px; bottom: 14px;
+  z-index: 100;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
-  border-right: 1px solid var(--border-soft);
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
-  transition: border-color 0.35s ease, transform 0.32s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1);
-  overflow: visible;
+  border-radius: 26px;
+  background:
+    radial-gradient(120% 60% at 100% 0%, rgba(199, 213, 159, 0.16) 0%, transparent 55%),
+    linear-gradient(180deg, #4a5f1e 0%, #40531a 45%, #34440f 100%);
+  box-shadow: 0 18px 50px rgba(40, 52, 16, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ═══════════════════════════════════════════════
-   DESKTOP COLLAPSE → slim ICON RAIL (Macro-style)
-   ═══════════════════════════════════════════════ */
-@media (min-width: 769px) {
-  .sidebar--desktop-closed { width: 74px; }
+/* ── Logo ── */
+.sidebar__logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 18px 16px;
+  flex-shrink: 0;
+}
+.sidebar__logo-icon {
+  width: 38px; height: 38px; flex-shrink: 0;
+  border-radius: 12px; overflow: hidden;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(199, 213, 159, 0.5);
+}
+.logo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sidebar__logo-name {
+  flex: 1; min-width: 0;
+  font-size: 1.12rem; font-weight: 800;
+  color: var(--sb-text-strong);
+  letter-spacing: -0.03em;
+}
+.sidebar__toggle {
+  width: 28px; height: 28px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 9px; border: 1px solid var(--sb-line);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--sb-text); cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.sidebar__toggle:hover { background: rgba(255, 255, 255, 0.14); color: #fff; }
 
-  /* Hide every piece of text / meta — icon rail only */
+/* ── Scroll area ── */
+.sidebar__scroll {
+  flex: 1; min-height: 0;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 0 12px 14px;
+  -webkit-overflow-scrolling: touch;
+}
+.sidebar__scroll::-webkit-scrollbar { width: 3px; }
+.sidebar__scroll::-webkit-scrollbar-thumb { background: rgba(199, 213, 159, 0.3); border-radius: 999px; }
+
+/* ── Groups ── */
+.sidebar__group { padding: 14px 0 2px; }
+.sidebar__group-label {
+  display: block;
+  font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(199, 213, 159, 0.62);
+  padding: 0 12px; margin-bottom: 8px;
+}
+.sidebar__nav { display: flex; flex-direction: column; gap: 3px; }
+
+/* ── Items ── */
+.nav-item {
+  position: relative;
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 0;
+  background: transparent;
+  color: var(--sb-text);
+  font-family: inherit; text-align: left; text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+.nav-item:hover { background: rgba(255, 255, 255, 0.09); color: #fff; }
+.nav-item:active { transform: scale(0.985); }
+
+.nav-item__icon {
+  width: 22px; height: 22px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-item__label {
+  flex: 1; min-width: 0;
+  font-size: 0.86rem; font-weight: 600; letter-spacing: -0.02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Active → Tea Green pill, Moss text */
+.nav-item--active,
+.nav-item--active:hover {
+  background: var(--tea);
+  color: var(--moss-deep);
+  box-shadow: 0 6px 16px rgba(20, 28, 6, 0.28);
+}
+.nav-item--active .nav-item__label { font-weight: 800; }
+
+.nav-item__meta { margin-left: auto; display: flex; align-items: center; flex-shrink: 0; }
+.nav-item__badge {
+  font-size: 0.62rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 999px;
+  color: var(--tea);
+  background: rgba(199, 213, 159, 0.14);
+  border: 1px solid rgba(199, 213, 159, 0.3);
+}
+.nav-item--active .nav-item__badge {
+  color: var(--moss-deep);
+  background: rgba(64, 83, 26, 0.12);
+  border-color: rgba(64, 83, 26, 0.28);
+}
+
+/* ── Upgrade card ── */
+.sidebar__upgrade {
+  position: relative; overflow: hidden;
+  margin: 18px 2px 12px;
+  padding: 16px 15px 15px;
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(199, 213, 159, 0.42) 0%, transparent 60%),
+    linear-gradient(160deg, #567028 0%, #2f3e12 100%);
+  border: 1px solid rgba(199, 213, 159, 0.28);
+}
+.upgrade__header { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+.upgrade__icon {
+  width: 26px; height: 26px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 9px; background: var(--tea); color: var(--moss-deep);
+}
+.upgrade__title { margin: 0; font-size: 0.95rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+.upgrade__desc {
+  margin: 0 0 13px;
+  font-size: 0.74rem; line-height: 1.5; font-weight: 500;
+  color: rgba(244, 248, 232, 0.72);
+}
+.upgrade__btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px; border: 0; border-radius: 999px; cursor: pointer;
+  font-family: inherit; font-size: 0.76rem; font-weight: 800;
+  background: var(--tea); color: var(--moss-deep);
+  transition: transform 0.16s ease, background 0.16s ease;
+}
+.upgrade__btn:hover { background: #d8e4b6; transform: translateY(-1px); }
+.upgrade__btn:active { transform: translateY(0); }
+
+/* ── Logout ── */
+/* Glass pill — same frosted recipe as the navbar capsule */
+.sidebar__logout {
+  position: relative;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 12px 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.19);
+  backdrop-filter: blur(23px);
+  -webkit-backdrop-filter: blur(23px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 6px 3px rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-family: inherit; font-size: 0.82rem; font-weight: 800;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+/* Light-catch highlights (top + left edge), inset to follow the curve */
+.sidebar__logout::before,
+.sidebar__logout::after { content: ''; position: absolute; pointer-events: none; }
+.sidebar__logout::before {
+  top: 0; left: 22px; right: 22px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+}
+.sidebar__logout::after {
+  top: 12px; bottom: 12px; left: 0; width: 1px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), transparent, rgba(255, 255, 255, 0.3));
+}
+.sidebar__logout:hover { background: rgba(255, 255, 255, 0.28); }
+.sidebar__logout:active { transform: scale(0.98); }
+
+/* ══════════════════════════════════════════════
+   DESKTOP COLLAPSE → slim icon rail
+   ══════════════════════════════════════════════ */
+@media (min-width: 769px) {
+  .sidebar--desktop-closed { width: 76px; }
   .sidebar--desktop-closed .sidebar__logo-name,
-  .sidebar--desktop-closed .vaulto-badge,
+  .sidebar--desktop-closed .sidebar__toggle,
   .sidebar--desktop-closed .sidebar__group-label,
   .sidebar--desktop-closed .nav-item__label,
   .sidebar--desktop-closed .nav-item__meta,
   .sidebar--desktop-closed .sidebar__upgrade,
-  .sidebar--desktop-closed .sidebar__account-info,
-  .sidebar--desktop-closed .sidebar__account-chev {
-    display: none;
-  }
+  .sidebar--desktop-closed .sidebar__logout-text { display: none; }
 
-  /* Center the logo */
-  .sidebar--desktop-closed .sidebar__logo {
-    justify-content: center;
-    padding: 18px 0 16px;
-  }
-
-  /* Center nav rows → rounded icon buttons */
-  .sidebar--desktop-closed .sidebar__nav { gap: 6px; align-items: center; }
-  .sidebar--desktop-closed .sidebar__group { padding: 12px 0 2px; }
-  .sidebar--desktop-closed .nav-item {
-    justify-content: center;
-    width: 44px; height: 44px; padding: 0;
-    margin: 0 auto; border-radius: 12px;
-  }
-
-  /* Account → avatar only, centered */
-  .sidebar--desktop-closed .sidebar__account {
-    justify-content: center; width: 44px; margin: 0 auto 10px; padding: 5px;
-  }
-  /* Logout → icon only (font-size:0 hides the text node, icon keeps its size) */
-  .sidebar--desktop-closed .sidebar__logout {
-    width: 44px; margin: 0 auto 16px; padding: 11px 0; font-size: 0; gap: 0;
-  }
+  .sidebar--desktop-closed .sidebar__logo { justify-content: center; padding: 18px 0 12px; }
+  .sidebar--desktop-closed .sidebar__scroll { padding: 0 10px 14px; }
+  .sidebar--desktop-closed .sidebar__nav { align-items: center; }
+  .sidebar--desktop-closed .nav-item { justify-content: center; width: 44px; height: 44px; padding: 0; }
+  .sidebar--desktop-closed .sidebar__logout { width: 44px; height: 44px; padding: 0; margin: 12px auto 0; }
 }
 
-/* ── Mobile backdrop ── */
-.sidebar-backdrop {
-  position: fixed; inset: 0; z-index: 99;
-  background: rgba(0,0,0,.55);
-}
-.backdrop-fade-enter-active, .backdrop-fade-leave-active { transition: opacity 0.28s ease; }
-.backdrop-fade-enter-from, .backdrop-fade-leave-to { opacity: 0; }
-
-
-/* ── Tablet — 769px–1366px (iPad Mini → iPad Pro 13") ── */
+/* ── Tablet ── */
 @media (min-width: 769px) and (max-width: 1366px) {
-  .sidebar { width: 245px; }
-  .sidebar__group { padding: 18px 14px 4px; }
-  .nav-item { padding: 10px 11px; }
-  .nav-item__label { font-size: 0.84rem; }
-  .sidebar__nav { gap: 3px; }
+  .sidebar:not(.sidebar--desktop-closed) { width: 232px; }
+  .nav-item { padding: 9px 11px; }
+  .nav-item__label { font-size: 0.82rem; }
 }
 
-/* ── iPad landscape short viewport (height ≤ 900px, width ≥ 769px) ── */
-@media (max-height: 900px) and (min-width: 769px) {
-  .sidebar__logo { padding: 12px 16px 10px; }
-  .sidebar__group { padding: 10px 12px 3px; }
-  .nav-item { padding: 6px 9px; }
-  .nav-item__icon { width: 28px; height: 28px; border-radius: 8px; }
-
-  .sidebar__upgrade {
-    min-height: auto;
-    padding: 12px 13px;
-    margin: 0 12px 10px;
-  }
-  .upgrade__body { padding-right: 78px; }
-  .upgrade__title { font-size: 1rem; }
-  .upgrade__btn { margin-top: 8px; padding: 5px 14px; font-size: 0.73rem; }
-  .upgrade__deco-img { width: 76px; height: 76px; }
-
-  .sidebar__logout {
-    margin: 0 12px 14px;
-    width: calc(100% - 24px);
-    padding: 9px 0;
-    font-size: 0.78rem;
-  }
+/* ── Short viewports ── */
+@media (max-height: 820px) and (min-width: 769px) {
+  .sidebar__group { padding-top: 10px; }
+  .nav-item { padding: 8px 12px; }
 }
-
-/* ── Very short viewport — hide upgrade card (height ≤ 700px) ── */
 @media (max-height: 700px) and (min-width: 769px) {
   .sidebar__upgrade { display: none; }
 }
 
+/* ══════════════════════════════════════════════
+   MOBILE — slide-in drawer
+   ══════════════════════════════════════════════ */
+.sidebar-backdrop {
+  position: fixed; inset: 0; z-index: 99;
+  background: rgba(20, 28, 6, 0.55);
+}
+.backdrop-fade-enter-active, .backdrop-fade-leave-active { transition: opacity 0.28s ease; }
+.backdrop-fade-enter-from, .backdrop-fade-leave-to { opacity: 0; }
+
 @media (max-width: 768px) {
   .sidebar {
-    transform: translateX(-100%);
-    z-index: 100;
-    width: 260px;
-    background: var(--bg);
-    border-right: 1px solid var(--border-soft);
+    top: 0; left: 0; bottom: 0;
+    width: 280px;
+    border-radius: 0 26px 26px 0;
+    transform: translateX(-105%);
   }
   .sidebar--open { transform: translateX(0); }
-  .vaulto-badge { display: none; }
-
-  /* Compact nav on mobile */
-  .sidebar__logo { padding: 14px 16px 12px; background: transparent; }
-  .sidebar__group { padding: 12px 10px 4px; background: transparent; }
-  .nav-item { padding: 9px 8px; background: transparent !important; }
-  .nav-item:hover { background: transparent !important; }
-  .nav-item--active { background: transparent !important; }
-  .nav-item__label { font-size: 1.1rem !important; font-weight: 700 !important; }
-  .nav-item__icon { width: 28px; height: 28px; border-radius: 7px; background: transparent !important; }
-  .sidebar__group-label { font-size: 0.82rem !important; letter-spacing: 0.08em; }
-  .nav-item__badge { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
-  .sidebar__scroll { background: transparent; }
-
-  /* Compact upgrade card */
-  .sidebar__upgrade {
-    min-height: auto;
-    padding: 14px 14px 12px;
-    margin: 0 10px 12px;
-    border-radius: 16px;
-  }
-  .sidebar__logout { background: transparent !important; }
-  .upgrade__body { padding-right: 76px; }
-  .upgrade__label { font-size: 0.68rem; }
-  .upgrade__title { font-size: 0.95rem; }
-  .upgrade__btn { margin-top: 7px; padding: 5px 13px; font-size: 0.7rem; }
-  .upgrade__deco-img { width: 72px; height: 72px; }
-
+  .sidebar__toggle { display: none; }
+  .nav-item__label { font-size: 0.95rem; }
 }
 
-/* ── Scrollable nav wrapper ── */
-.sidebar__scroll {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-height: 0;
-  padding-bottom: 4px;
-  -webkit-overflow-scrolling: touch;
-  position: relative;
-  z-index: 1;
-}
-
-.sidebar__scroll::-webkit-scrollbar { width: 3px; }
-.sidebar__scroll::-webkit-scrollbar-track { background: transparent; }
-.sidebar__scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
-
-/* ── Logo ── */
-.sidebar__logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 20px 20px 18px;
-  border-bottom: 1px solid var(--border-soft);
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.sidebar__logo-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 2px solid var(--border-soft);
-  background: var(--surface);
-}
-
-.logo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  display: block;
-}
-
-
-.sidebar__logo-name {
-  font-weight: 800;
-  font-size: 1.1rem;
-  color: var(--t1);
-  letter-spacing: -0.025em;
-  flex: 1;
-  min-width: 0;
-}
-
-/* ── Toggle/close button (gradient box) ── */
-.vaulto-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  margin-right: 4px;
-  outline: none;
-}
-
-/* ── Section group ── */
-.sidebar__group {
-  padding: 24px 4px 8px;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.sidebar__group-label {
-  display: block;
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: var(--t2);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0 8px;
-  margin-bottom: 10px;
-}
-
-/* ── Nav items ── */
-.sidebar__nav {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 9px 12px;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: background 0.18s ease, color 0.18s ease;
-  position: relative;
-  border: 1px solid transparent;
-  width: calc(100% - 28px);
-  margin: 0 14px;
-}
-
-.nav-item:hover { background: var(--accent-dim); }
-
-/* Active item uses the same green radial-glow styling as the dashboard boxes */
-.nav-item--active {
-  background:
-    radial-gradient(95% 150% at 0% 50%, rgba(34,197,94,0.14) 0%, rgba(34,197,94,0.04) 40%, transparent 64%),
-    var(--glass-hover);
-  border-color: var(--accent-border);
-}
-.nav-item--active:hover {
-  background:
-    radial-gradient(95% 150% at 0% 50%, rgba(34,197,94,0.18) 0%, rgba(34,197,94,0.05) 40%, transparent 64%),
-    var(--glass-hover);
-}
-.nav-item--active .nav-item__icon { color: var(--accent); }
-.nav-item--active .nav-item__label { color: var(--t1); font-weight: 700; }
-
-/* Stronger glow on dark mode (matches the boxes) */
-:root:not([data-theme="light"]) .nav-item--active {
-  background:
-    radial-gradient(95% 150% at 0% 50%, rgba(34,197,94,0.30) 0%, rgba(34,197,94,0.09) 42%, transparent 66%),
-    var(--glass-hover);
-}
-
-.nav-item__icon {
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--t2);
-  transition: color 0.18s ease;
-}
-.nav-item:hover .nav-item__icon { color: var(--t1); }
-.nav-item--active .nav-item__icon { color: var(--accent); }
-
-.nav-item__label {
-  font-size: 0.845rem;
-  font-weight: 600;
-  color: var(--t1);
-  transition: color 0.2s ease;
-}
-
-.nav-item__badge {
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: var(--t1);
-  background: var(--glass-hover);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--border);
-  padding: 2px 7px;
-  border-radius: 999px;
-  flex-shrink: 0;
-}
-
-/* ── Trailing meta (badges + lock) ── */
-.nav-item__meta {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-shrink: 0;
-}
-.nav-item__label { min-width: 0; }
-
-/* Green outline TOOLS badge */
-.nav-item__badge--tools {
-  color: #16a34a;
-  background: rgba(22, 163, 74, 0.08);
-  border: 1px solid rgba(22, 163, 74, 0.45);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-/* Red NEW badge */
-.nav-item__badge--new {
-  color: #fff;
-  background: #ef4444;
-  border: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  letter-spacing: 0.02em;
-}
-/* Green "available" check */
-.nav-item__check {
-  display: flex;
-  align-items: center;
-  color: #16a34a;
-  flex-shrink: 0;
-}
-/* Lock icon */
-.nav-item__lock {
-  color: var(--t3);
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-
-/* Plain button rows (Start Reselling, Terms) */
-.nav-item--plain {
-  background: transparent;
-  border: 1px solid transparent;
-  cursor: pointer;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  text-align: left;
-}
-.nav-item--plain:hover {
-  background: var(--glass);
-  border-color: var(--border-soft);
-}
-
-/* ── Profile strip ── */
-/* ── Account block ── */
-.sidebar__account {
-  display: flex; align-items: center; gap: 10px;
-  margin: 0 14px 10px;
-  width: calc(100% - 28px);
-  padding: 9px 11px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: var(--glass);
-  cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease;
-  position: relative; z-index: 1;
-}
-.sidebar__account:hover { background: var(--glass-hover); border-color: var(--accent-border); }
-.sidebar__account-avatar {
-  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-  object-fit: cover; border: 1px solid var(--border);
-  background: var(--surface-2);
-}
-.sidebar__account-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; text-align: left; }
-.sidebar__account-name { font-size: 0.82rem; font-weight: 700; color: var(--t1); line-height: 1.2; }
-.sidebar__account-mail {
-  font-size: 0.68rem; color: var(--t3); font-weight: 500;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.sidebar__account-chev { color: var(--t3); flex-shrink: 0; }
-
-.sidebar__logout {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin: 0 14px 18px;
-  padding: 11px 0;
-  width: calc(100% - 28px);
-  border-radius: 12px;
-  border: 1.5px solid rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.08);
-  color: #ef4444;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  position: relative;
-  z-index: 1;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-}
-.sidebar__logout:hover {
-  background: rgba(239, 68, 68, 0.16);
-  border-color: rgba(239, 68, 68, 0.55);
-  transform: translateY(-1px);
-}
-.sidebar__logout:active { transform: translateY(0); }
-
-/* ── Upgrade CTA ── */
-.sidebar__upgrade {
-  position: relative;
-  z-index: 1;
-  margin: 0 14px 18px;
-  padding: 18px 16px 16px;
-  border-radius: 18px;
-  overflow: hidden;
-  background:
-    radial-gradient(130% 90% at 100% 0%, rgba(34,197,94,0.30) 0%, transparent 55%),
-    linear-gradient(165deg, #0f2017 0%, #0a140f 55%, #06110c 100%);
-  border: 1px solid rgba(34,197,94,0.24);
-  flex-shrink: 0;
-}
-/* Soft blurred green orb — premium depth */
-.sidebar__upgrade::before {
-  content: '';
-  position: absolute; top: -40px; right: -26px;
-  width: 120px; height: 120px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(34,197,94,0.55) 0%, transparent 70%);
-  filter: blur(16px); pointer-events: none; z-index: 0;
-}
-.upgrade__header, .upgrade__desc, .upgrade__actions { position: relative; z-index: 1; }
-
-.upgrade__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  padding-right: 16px;
-}
-
-.upgrade__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  color: #fff;
-  background: linear-gradient(135deg, var(--accent-grad-1) 0%, var(--accent) 55%, var(--accent-grad-3) 100%);
-  flex-shrink: 0;
-}
-
-.upgrade__title {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: #fff;
-  margin: 0;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-}
-
-.upgrade__desc {
-  font-size: 0.76rem;
-  color: rgba(255,255,255,0.64);
-  font-weight: 500;
-  line-height: 1.45;
-  margin: 0 0 14px;
-}
-
-.upgrade__actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.upgrade__btn {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 18px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #34d17a 0%, #16a34a 55%, #0d7a39 100%);
-  border: none;
-  color: #fff;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 0.76rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.18s ease;
-}
-.upgrade__btn:hover {
-  transform: translateY(-1px);
-}
-.upgrade__btn:active { transform: translateY(0); }
-/* Moving glass shine */
-.upgrade__btn::after {
-  content: '';
-  position: absolute; top: 0; bottom: 0; left: -80%;
-  width: 45%;
-  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.22) 40%, rgba(255,255,255,0.75) 50%, rgba(255,255,255,0.22) 60%, transparent 100%);
-  transform: skewX(-22deg); pointer-events: none; z-index: 2;
-  animation: upg-shine 3s ease-in-out infinite;
-  animation-delay: 1s;
-}
-@keyframes upg-shine { 0% { left: -80%; } 35% { left: 130%; } 100% { left: 130%; } }
-@media (prefers-reduced-motion: reduce) { .upgrade__btn::after { animation: none; display: none; } }
-
-.upgrade__learn {
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: #34d17a;
-  cursor: pointer;
-  text-decoration: none;
-}
-.upgrade__learn:hover { text-decoration: underline; }
-
-
-/* ── Safari / older iPadOS fallback — -webkit-fill-available ── */
 @supports not (height: 100dvh) {
   .sidebar { height: -webkit-fill-available; }
 }

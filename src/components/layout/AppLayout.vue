@@ -40,27 +40,28 @@ const { desktopOpen } = useSidebar()
   position: relative;
 }
 
+/* Sidebar floats 14px from the edge: 14 + 248 (+ gutter) */
 .app-layout__main {
-  margin-left: 260px;
+  margin-left: 276px;
   min-height: 100vh;
   position: relative;
   transition: margin-left 0.32s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (min-width: 769px) {
-  .app-layout__main--collapsed { margin-left: 74px; }
+  .app-layout__main--collapsed { margin-left: 104px; }
 }
 
 .app-layout__content {
-  padding: 78px 24px 24px;
-  max-width: 1320px;
+  padding: 84px 28px 28px;
+  max-width: 1360px;
   margin: 0 auto;
 }
 
 @media (max-width: 1366px) and (min-width: 769px) {
-  .app-layout__main { margin-left: 245px; }
-  .app-layout__main--collapsed { margin-left: 74px; }
-  .app-layout__content { padding: 76px 18px 24px; }
+  .app-layout__main { margin-left: 260px; }
+  .app-layout__main--collapsed { margin-left: 104px; }
+  .app-layout__content { padding: 82px 20px 24px; }
 }
 @media (max-width: 768px) {
   .app-layout__main { margin-left: 0; }

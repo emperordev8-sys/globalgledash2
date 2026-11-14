@@ -13,7 +13,7 @@ export const defaultTourSteps = [
   {
     target: null, // centered welcome card, no spotlight
     center: true,
-    title: 'Welcome to your dashboard 👋',
+    title: 'Welcome to your dashboard',
     body: "This is your home base. Give us 20 seconds and we'll point out the essentials — you can skip anytime.",
   },
   {
@@ -33,8 +33,8 @@ export const defaultTourSteps = [
   },
   {
     target: '[data-tour="quick-actions"]',
-    title: 'Jump straight into anything',
-    body: 'Quick Actions get you into any service in one click — and the sidebar on the left has every feature grouped by category.',
+    title: 'Jump into any workspace',
+    body: 'Each workspace opens a whole area of your toolkit in one click — and the sidebar on the left has every feature grouped by category.',
   },
 ]
 

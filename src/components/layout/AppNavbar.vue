@@ -65,36 +65,6 @@
         Support
       </button>
 
-      <!-- Theme toggle (dropdown: Light / Dark / Auto) -->
-      <div class="navbar__icon-btn navbar__theme" ref="themeRef" @click.stop="themeOpen = !themeOpen"
-        :aria-label="'Appearance: ' + themePref" role="button">
-        <svg v-if="theme !== 'dark'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-        </svg>
-        <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-
-        <Transition name="profile-chip-drop">
-          <div v-if="themeOpen" class="navbar__theme-dropdown" @click.stop>
-            <span class="navbar__theme-label">Appearance</span>
-            <button
-              v-for="opt in themeOptions" :key="opt.value"
-              class="theme-opt" :class="{ 'theme-opt--active': themePref === opt.value }"
-              @click="setThemePref(opt.value); themeOpen = false">
-              <span class="theme-opt__ico" v-html="opt.icon" />
-              <span class="theme-opt__label">{{ opt.label }}</span>
-              <svg v-if="themePref === opt.value" class="theme-opt__check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-            </button>
-          </div>
-        </Transition>
-      </div>
-
       <!-- Currency selector -->
       <div class="navbar__pill navbar__pill--currency" ref="currencyRef" @click.stop="currencyOpen = !currencyOpen">
         <span>{{ currency }}</span>
@@ -247,19 +217,6 @@
     <!-- Right actions -->
     <div class="mn-actions">
 
-      <!-- Theme toggle -->
-      <button class="mn-icon-btn" @click.stop="toggleTheme" :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
-        <svg v-if="theme === 'dark'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-        </svg>
-        <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-      </button>
-
       <!-- Notifications -->
       <button class="mn-icon-btn" @click.stop="toggleNotifications" ref="mobileNotifBtn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -326,22 +283,10 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSidebar } from '../../composables/useSidebar.js'
-import { useTheme } from '../../composables/useTheme.js'
 
 const route = useRoute()
 const router = useRouter()
 const { sidebarOpen, desktopOpen, toggleSidebar, toggleDesktopSidebar } = useSidebar()
-const { theme, themePref, setThemePref, toggleTheme } = useTheme()
-
-/* ── Appearance dropdown ── */
-const themeOpen = ref(false)
-const themeRef = ref(null)
-const themeOptions = [
-  { value: 'light', label: 'Light', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>' },
-  { value: 'dark', label: 'Dark', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' },
-  { value: 'auto', label: 'Auto (match device)', icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>' },
-]
-
 
 /* ── Page meta ── */
 const pages = {
@@ -445,7 +390,6 @@ const handleOutsideClick = (e) => {
   if (!profileChipRef.value?.contains(e.target)) profileDropOpen.value = false
   if (!currencyRef.value?.contains(e.target)) currencyOpen.value = false
   if (!searchRef.value?.contains(e.target)) searchOpen.value = false
-  if (!themeRef.value?.contains(e.target)) themeOpen.value = false
 }
 onMounted(() => document.addEventListener('click', handleOutsideClick))
 onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
@@ -457,19 +401,54 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
    ══════════════════════════════ */
 .navbar {
   position: fixed;
-  top: 0; left: 260px; right: 0;
+  /* Floating glass capsule */
+  top: 14px; left: 276px; right: 28px;
   transition: left 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-  height: 64px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 22px;
-  background: linear-gradient(90deg, var(--surface-sunken) 0%, var(--surface-raised) 50%, var(--surface-sunken) 100%);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border-bottom: 1px solid var(--border-soft);
+  padding: 0 12px 0 12px;
+  background: rgba(255, 255, 255, 0.19);
+  backdrop-filter: blur(23px);
+  -webkit-backdrop-filter: blur(23px);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 32px rgba(64, 83, 26, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 6px 3px rgba(255, 255, 255, 0.3);
+  /* overflow stays visible — the search / theme / notification / profile dropdowns hang below the bar */
   z-index: 90;
   gap: 16px;
+}
+
+/* Light-catch highlights (top edge + left edge), inset to follow the pill curve */
+.navbar::before,
+.navbar::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+.navbar::before {
+  top: 0; left: 28px; right: 28px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+}
+.navbar::after {
+  top: 14px; bottom: 14px; left: 0; width: 1px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), transparent, rgba(255, 255, 255, 0.3));
+}
+
+/* Dark mode: tint the glass with tea green instead of white */
+:root:not([data-theme="light"]) .navbar {
+  background: rgba(199, 213, 159, 0.09);
+  border-color: rgba(199, 213, 159, 0.22);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(199, 213, 159, 0.28),
+    inset 0 -1px 0 rgba(199, 213, 159, 0.08),
+    inset 0 0 6px 3px rgba(199, 213, 159, 0.08);
 }
 
 .navbar__left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
@@ -505,17 +484,18 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
 /* Join Channel */
 .navbar__join {
   display: inline-flex; align-items: center; gap: 7px;
-  height: 34px; padding: 0 16px;
-  background: #0b86c9; color: #fff;
+  height: 38px; padding: 0 18px;
+  background: var(--moss); color: var(--tea);
   border-radius: 999px;
-  font-size: 0.78rem; font-weight: 700;
+  font-size: 0.78rem; font-weight: 800;
   text-decoration: none; white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(64, 83, 26, 0.28);
   transition: background 0.2s ease;
   animation: join-bounce 5s cubic-bezier(0.28, 0.84, 0.42, 1) infinite;
   animation-delay: 1.5s;
   will-change: transform;
 }
-.navbar__join:hover { background: #0a76b1; animation-play-state: paused; }
+.navbar__join:hover { background: var(--moss-soft); animation-play-state: paused; }
 .navbar__join:active { transform: scale(0.97); }
 
 /* Bounce once (~1s), then rest — repeats every 5s */
@@ -581,61 +561,30 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
 .navbar__pill {
   position: relative;
   display: flex; align-items: center; gap: 7px;
-  height: 36px; padding: 0 14px;
-  background: var(--glass-hover);
-  border: 1px solid var(--border-soft);
+  height: 40px; padding: 0 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
   border-radius: 999px;
   font-family: inherit; font-size: 0.8rem; font-weight: 700;
   color: var(--t1);
+  box-shadow: var(--shadow-card);
   cursor: pointer; white-space: nowrap;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
-.navbar__pill:hover { background: var(--glass); }
+.navbar__pill:hover { background: var(--accent-dim); border-color: var(--accent-border); }
 .navbar__pill svg { color: var(--icon-stroke); }
 .navbar__chev { transition: transform 0.2s ease; }
 .navbar__chev--open { transform: rotate(180deg); }
 .navbar__currency-sym { color: var(--t3); font-weight: 600; }
 .npd-item--active { background: var(--glass-hover); }
 
-/* Appearance (theme) dropdown */
-.navbar__theme { position: relative; }
-.navbar__theme-dropdown {
-  position: absolute;
-  top: calc(100% + 10px); right: 0;
-  min-width: 210px;
-  background: linear-gradient(160deg, var(--surface-raised) 0%, var(--surface-sunken) 100%);
-  border: 1px solid var(--border);
-  border-radius: 14px; padding: 6px;
-   z-index: 200;
-  transform-origin: top right;
-  cursor: default;
-}
-.navbar__theme-label {
-  display: block;
-  font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--t3); padding: 8px 10px 6px;
-}
-.theme-opt {
-  display: flex; align-items: center; gap: 10px;
-  width: 100%; padding: 9px 10px;
-  border-radius: 10px; border: none;
-  background: transparent; color: var(--t1);
-  font-family: inherit; font-size: 0.82rem; font-weight: 600;
-  cursor: pointer; text-align: left;
-  transition: background 0.16s ease;
-}
-.theme-opt:hover { background: var(--glass-hover); }
-.theme-opt--active { background: var(--glass); }
-.theme-opt__ico { display: flex; align-items: center; color: var(--t2); flex-shrink: 0; }
-.theme-opt__label { flex: 1; }
-.theme-opt__check { color: #16a34a; flex-shrink: 0; }
-
 /* Profile circle */
 .navbar__icon-btn--profile {
-  width: 36px; height: 36px;
+  width: 40px; height: 40px;
   border-radius: 50%;
-  border: 1px solid var(--border-soft);
-  background: var(--surface-raised);
+  border: 2px solid var(--tea);
+  background: var(--bg);
+  box-shadow: var(--shadow-card);
 }
 .navbar__icon-btn--profile > svg { width: 17px; height: 17px; }
 
@@ -662,8 +611,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
 .npd-avatar {
   width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 55%, #0f7a37 100%);
-  color: #fff; font-size: 1.05rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--moss-soft) 0%, var(--moss) 60%, var(--moss-deep) 100%);
+  color: var(--tea); font-size: 1.05rem; font-weight: 800;
 }
 .npd-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .npd-name { font-size: 0.9rem; font-weight: 800; color: var(--t1); }
@@ -699,10 +648,10 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
 .mobile-nav {
   display: none;
   position: fixed; top: 0; left: 0; right: 0; height: 64px; z-index: 90;
-  background: linear-gradient(90deg, var(--surface-sunken) 0%, var(--surface-raised) 50%, var(--surface-sunken) 100%);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--canvas) 88%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-bottom: 0;
   align-items: center; justify-content: space-between;
   padding: 0 16px; gap: 12px;
   transition: background 0.35s ease;
@@ -733,7 +682,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
 .mn-icon-btn {
   position: relative; width: 38px; height: 38px;
   display: flex; align-items: center; justify-content: center;
-  background: var(--surface-raised); border: 1px solid var(--border-soft);
+  background: var(--bg); border: 1px solid var(--border);
   border-radius: 12px; cursor: pointer; color: var(--icon-stroke);
   transition: all 0.2s;
 }
@@ -847,12 +796,12 @@ onBeforeUnmount(() => document.removeEventListener('click', handleOutsideClick))
    RESPONSIVE: show/hide
    ══════════════════════════════ */
 @media (max-width: 1366px) and (min-width: 769px) {
-  .navbar { padding: 0 18px; left: 245px; }
-  .navbar--collapsed { left: 74px; }
+  .navbar { padding: 0 10px; left: 260px; right: 20px; }
+  .navbar--collapsed { left: 104px; }
 }
 
 @media (min-width: 769px) {
-  .navbar--collapsed { left: 74px; }
+  .navbar--collapsed { left: 104px; }
 }
 
 @media (max-width: 768px) {
